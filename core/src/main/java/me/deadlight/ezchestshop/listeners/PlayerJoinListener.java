@@ -9,7 +9,6 @@ import me.deadlight.ezchestshop.EzChestShop;
 import me.deadlight.ezchestshop.data.Config;
 import me.deadlight.ezchestshop.data.DatabaseManager;
 import me.deadlight.ezchestshop.data.LanguageManager;
-import me.deadlight.ezchestshop.data.mysql.MySQL;
 import me.deadlight.ezchestshop.data.sqlite.SQLite;
 import me.deadlight.ezchestshop.utils.BlockOutline;
 import me.deadlight.ezchestshop.utils.Utils;
@@ -38,11 +37,6 @@ public final class PlayerJoinListener implements Listener {
         UUID uuid = event.getUniqueId();
 
         switch (Config.database_type) {
-            case MYSQL -> MySQL.playerTables.forEach(t -> {
-                if (db.hasTable(t) && !db.hasPlayer(t, uuid)) {
-                    db.preparePlayerData(t, uuid.toString());
-                }
-            });
             case SQLITE -> SQLite.playerTables.forEach(t -> {
                 if (db.hasTable(t) && !db.hasPlayer(t, uuid)) {
                     db.preparePlayerData(t, uuid.toString());

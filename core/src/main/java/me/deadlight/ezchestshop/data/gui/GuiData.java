@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import me.deadlight.ezchestshop.EzChestShop;
-import me.deadlight.ezchestshop.listeners.UpdateChecker;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -40,7 +39,6 @@ public class GuiData {
         logs = new ContainerGui(guisConfig, "transaction-logs");
         messageManager = new ContainerGui(guisConfig, "hologram-messages-manager");
         config = guisConfig;
-        new UpdateChecker().resetGuiCheck();
     }
 
     public static ContainerGui getLogs() {

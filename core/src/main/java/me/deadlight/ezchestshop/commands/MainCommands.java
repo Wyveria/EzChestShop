@@ -10,7 +10,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import com.palmergames.bukkit.towny.utils.ShopPlotUtil;
 import me.deadlight.ezchestshop.Constants;
 import me.deadlight.ezchestshop.EzChestShop;
 import me.deadlight.ezchestshop.data.Config;
@@ -25,7 +24,6 @@ import me.deadlight.ezchestshop.utils.objects.EzShop;
 import me.deadlight.ezchestshop.utils.objects.ShopSettings;
 import me.deadlight.ezchestshop.utils.worldguard.FlagRegistry;
 import me.deadlight.ezchestshop.utils.worldguard.WorldGuardUtils;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Instrument;
@@ -285,14 +283,6 @@ public class MainCommands implements CommandExecutor, TabCompleter {
     private void createShop(Player player, String[] args, Block target) throws IOException {
         if (target != null && target.getType() != Material.AIR) {
             BlockState blockState = target.getState(false);
-            //slimefun check
-            if (EzChestShop.slimefun) {
-                boolean sfresult = BlockStorage.hasBlockInfo(target.getLocation());
-                if (sfresult) {
-                    player.sendMessage(LanguageManager.getInstance().slimeFunBlockNotSupported());
-                    return;
-                }
-            }
 
             if (EzChestShop.worldguard) {
                 if (!WorldGuardUtils.queryStateFlag(FlagRegistry.CREATE_SHOP, player)) {
@@ -304,18 +294,6 @@ public class MainCommands implements CommandExecutor, TabCompleter {
             if (blockState instanceof TileState state) {
                 if (Utils.isApplicableContainer(target)) {
                     if (checkIfLocation(target.getLocation(), player)) {
-                        if (EzChestShop.towny && Config.towny_integration_shops_only_in_shop_plots) {
-                            if (!ShopPlotUtil.isShopPlot(target.getLocation())) {
-                                player.spigot().sendMessage(LanguageManager.getInstance().notAllowedToCreateOrRemove(player));
-                                return;
-                            }
-                            if (!(ShopPlotUtil.doesPlayerOwnShopPlot(player, target.getLocation()) ||
-                                    ShopPlotUtil.doesPlayerHaveAbilityToEditShopPlot(player, target.getLocation()))) {
-                                player.spigot().sendMessage(LanguageManager.getInstance().notAllowedToCreateOrRemove(player));
-                                return;
-                            }
-                        }
-
                         PersistentDataContainer container = state.getPersistentDataContainer();
 
                         //owner (String) (player name)
@@ -899,13 +877,6 @@ public class MainCommands implements CommandExecutor, TabCompleter {
     private BlockState getLookedAtBlockStateIfOwner(Player player, boolean sendErrors, boolean isCreateOrRemove, Block target) {
         if (target != null && target.getType() != Material.AIR) {
             BlockState blockState = target.getState(false);
-            if (EzChestShop.slimefun) {
-                boolean sfresult = BlockStorage.hasBlockInfo(blockState.getBlock().getLocation());
-                if (sfresult) {
-                    player.sendMessage(LanguageManager.getInstance().slimeFunBlockNotSupported());
-                    return null;
-                }
-            }
             if (blockState instanceof TileState) {
                 if (Utils.isApplicableContainer(target)) {
                     if (checkIfLocation(target.getLocation(), player)) {

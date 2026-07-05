@@ -29,7 +29,6 @@ import me.deadlight.ezchestshop.data.Config;
 import me.deadlight.ezchestshop.data.DatabaseManager;
 import me.deadlight.ezchestshop.data.LanguageManager;
 import me.deadlight.ezchestshop.data.ShopContainer;
-import me.deadlight.ezchestshop.data.mysql.MySQL;
 import me.deadlight.ezchestshop.data.sqlite.SQLite;
 import me.deadlight.ezchestshop.enums.Database;
 import me.deadlight.ezchestshop.utils.objects.EzShop;
@@ -832,10 +831,6 @@ public final class Utils {
         if (Config.database_type == Database.SQLITE) {
             //initialize SQLite
             databaseManager = new SQLite(EzChestShop.getPlugin());
-            databaseManager.load();
-        } else if (Config.database_type == Database.MYSQL) {
-            //initialize MySQL
-            databaseManager = new MySQL(EzChestShop.getPlugin());
             databaseManager.load();
         } else {
             //shouldn't happen technically

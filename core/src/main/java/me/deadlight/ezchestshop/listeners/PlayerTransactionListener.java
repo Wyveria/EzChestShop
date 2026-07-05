@@ -27,7 +27,6 @@ import org.bukkit.persistence.PersistentDataType;
 public class PlayerTransactionListener implements Listener {
     @EventHandler
     public void onTransaction(PlayerTransactEvent event) {
-        logProfits(event);
         sendDiscordWebhook(event);
         if (((TileState) event.getContainerBlock().getState(false)).getPersistentDataContainer().getOrDefault(Constants.ENABLE_MESSAGE_KEY, PersistentDataType.INTEGER, 0) == 1) {
             OfflinePlayer owner = event.getOwner();
@@ -83,35 +82,6 @@ public class PlayerTransactionListener implements Listener {
 
         EzChestShop.getScheduler().runTaskAsynchronously(
                 () -> DiscordWebhook.queueTransaction(buyerName, sellerName, itemName, price, shopLocation, time, quantity, ownerName));
-    }
-
-    private void logProfits(PlayerTransactEvent event) {
-        Double price = event.getPrice();
-        Integer count = event.getCount();
-        // These next 4 are interesting:
-        //Integer count = amount / defaultAmount; // How many times were items bought. Considers Stack buying.
-        // Double single_price = price / count;
-        String id = Utils.LocationtoString(event.getContainerBlock().getLocation());
-        ItemStack item = event.getItem(); // Item shop sells
-        PlayerContainer owner = PlayerContainer.get(event.getOwner());
-        if (event.isBuy()) {
-            if (event.isShareIncome()) {
-                int admin_count = event.getAdminsUUID().size();
-                for (UUID uuid : event.getAdminsUUID()) {
-                    if (uuid.equals(event.getOwner().getUniqueId()))
-                        continue;
-                    PlayerContainer admin = PlayerContainer.get(Bukkit.getOfflinePlayer(uuid));
-                    admin.updateProfits(id, item, count, price / (admin_count + 1), price / count, 0, 0.0, 0.0);
-                }
-
-                owner.updateProfits(id, item, count, price / (admin_count + 1), event.getBuyPrice(), 0, 0.0, event.getSellPrice());
-            } else {
-                owner.updateProfits(id, item, count, price, event.getBuyPrice(), 0, 0.0, event.getSellPrice());
-            }
-        } else {
-            owner.updateProfits(id, item, 0, 0.0, event.getBuyPrice(), count, price, event.getSellPrice());
-        }
-        // ItemStack,BuyAmount,BuyPrice,SellAmount,SellPrice
     }
 
 }

@@ -7,7 +7,6 @@ import java.util.UUID;
 import me.deadlight.ezchestshop.EzChestShop;
 import me.deadlight.ezchestshop.Constants;
 import me.deadlight.ezchestshop.data.Config;
-import me.deadlight.ezchestshop.data.ShopCommandManager;
 import me.deadlight.ezchestshop.data.ShopContainer;
 import me.deadlight.ezchestshop.guis.ServerShopGUI;
 import me.deadlight.ezchestshop.guis.ShopGUI;
@@ -16,7 +15,6 @@ import me.deadlight.ezchestshop.utils.BlockOutline;
 import me.deadlight.ezchestshop.utils.Utils;
 import me.deadlight.ezchestshop.utils.worldguard.FlagRegistry;
 import me.deadlight.ezchestshop.utils.worldguard.WorldGuardUtils;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -59,13 +57,6 @@ public class ChestOpeningListener implements Listener {
         }
 
         Block chestblock = clickedBlock;
-        if (EzChestShop.slimefun) {
-            if (BlockStorage.hasBlockInfo(chestblock.getLocation())) {
-                ShopContainer.deleteShop(chestblock.getLocation());
-                return;
-            }
-        }
-
         PersistentDataContainer dataContainer = null;
         Location loc = chestblock.getLocation();
         TileState state = (TileState) chestblock.getState(false);
@@ -132,7 +123,7 @@ public class ChestOpeningListener implements Listener {
                         return;
                     }
                 }
-                Config.shopCommandManager.executeCommands(player, loc, ShopCommandManager.ShopType.ADMINSHOP, ShopCommandManager.ShopAction.OPEN, null);
+
                 ServerShopGUI serverShopGUI = new ServerShopGUI();
                 serverShopGUI.showGUI(player, dataContainer, chestblock);
                 return;
@@ -146,7 +137,6 @@ public class ChestOpeningListener implements Listener {
                 }
             }
             // At this point it is clear that some shop will open, so run opening commands here.
-            Config.shopCommandManager.executeCommands(player, loc, ShopCommandManager.ShopType.SHOP, ShopCommandManager.ShopAction.OPEN, null);
             ShopGUI.showGUI(player, dataContainer, chestblock, isAdmin);
         }
     }

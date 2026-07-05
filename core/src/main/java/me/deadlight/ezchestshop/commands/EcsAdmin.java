@@ -9,18 +9,13 @@ import me.deadlight.ezchestshop.EzChestShop;
 import me.deadlight.ezchestshop.Constants;
 import me.deadlight.ezchestshop.data.Config;
 import me.deadlight.ezchestshop.data.LanguageManager;
-import me.deadlight.ezchestshop.data.ShopCommandManager;
 import me.deadlight.ezchestshop.data.ShopContainer;
 import me.deadlight.ezchestshop.data.gui.GuiData;
-import me.deadlight.ezchestshop.guis.GuiEditorGUI;
 import me.deadlight.ezchestshop.utils.Utils;
 import me.deadlight.ezchestshop.utils.holograms.ShopHologram;
-import me.deadlight.ezchestshop.utils.objects.EzShop;
 import me.deadlight.ezchestshop.utils.worldguard.FlagRegistry;
 import me.deadlight.ezchestshop.utils.worldguard.WorldGuardUtils;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -116,85 +111,6 @@ public class EcsAdmin implements CommandExecutor, TabCompleter {
                         } else {
                             sendHelp(player);
                         }
-                    } else if (firstarg.equalsIgnoreCase("configure-guis")) {
-                        new GuiEditorGUI().showGuiEditorOverview(player);
-                    } else if (firstarg.equalsIgnoreCase("shop-commands")) {
-                        if (!Config.shopCommandsEnabled) {
-                            player.sendMessage(ChatColor.RED + "Enable this setting in the config!");
-                            return false;
-                        }
-                        if (args.length == 1) {
-                            Block target = player.getTargetBlockExact(5);
-                            if (target != null) {
-                                EzShop shop = ShopContainer.getShop(target.getLocation());
-                                if (shop != null) {
-                                    Config.shopCommandManager.showActionEditor(player, shop.getLocation());
-                                } else {
-                                    player.sendMessage(LanguageManager.getInstance().notAChestOrChestShop());
-                                }
-                            } else {
-                                player.sendMessage(LanguageManager.getInstance().lookAtChest());
-                            }
-                        } else {
-                            if (args[1].startsWith("W:")) {
-                                Location location = Utils.StringtoLocation(args[1]);
-                                if (location != null) {
-                                    if (args.length < 3) {
-                                        Config.shopCommandManager.showActionEditor(player, location);
-                                    } else if (args.length < 4) {
-                                        ShopCommandManager.ShopAction action = ShopCommandManager.ShopAction.valueOf(args[2]);
-                                        if (!Config.shopCommandManager.hasActionOptions(action)) {
-                                            // if the command doesn't have any options, directly show the command editor!
-                                            Config.shopCommandManager.showCommandEditor(player, location, action, null);
-                                        } else {
-                                            Config.shopCommandManager.showOptionEditor(player, location, action);
-                                        }
-                                    } else if (args.length >= 4) {
-                                        ShopCommandManager.ShopAction action = ShopCommandManager.ShopAction.valueOf(args[2]);
-                                        String option = args[3].equals("none") ? null : args[3];
-                                        if (args.length == 4) {
-                                            Config.shopCommandManager.showCommandEditor(player, location, action, option);
-                                        } else {
-                                            // longer then 3 args
-                                            if (args[4].equals("add")) {
-                                                if (args.length >= 5) {
-                                                    // get the command from any further args
-                                                    String newCommand = "";
-                                                    for (int i = 5; i < args.length; i++) {
-                                                        newCommand += args[i] + " ";
-                                                    }
-                                                    if (!newCommand.trim().equals("")) {
-                                                        Config.shopCommandManager.addCommand(player, location, action, option, newCommand.trim());
-                                                    }
-                                                }
-                                            } else if (args[4].equals("move")) {
-                                                if (args.length == 7) {
-                                                    Config.shopCommandManager.moveCommandIndex(player, location, action, option, Integer.parseInt(args[5]), args[6].equals("up"));
-                                                }
-
-                                            } else if (args[4].equals("edit")) {
-                                                if (args.length >= 7) {
-                                                    // get the command from any further args
-                                                    String newCommand = "";
-                                                    for (int i = 6; i < args.length; i++) {
-                                                        newCommand += args[i] + " ";
-                                                    }
-                                                    if (newCommand.trim().equals("")) {
-                                                        Config.shopCommandManager.removeCommand(player, location, action, option, Integer.parseInt(args[5]));
-                                                    } else {
-                                                        Config.shopCommandManager.editCommand(player, location, action, option, Integer.parseInt(args[5]), newCommand.trim());
-                                                    }
-                                                }
-                                            } else if (args[4].equals("remove")) {
-                                                if (args.length == 6) {
-                                                    Config.shopCommandManager.removeCommand(player, location, action, option, Integer.parseInt(args[5]));
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
                     } else {
                         sendHelp(player);
                     }
@@ -235,7 +151,6 @@ public class EcsAdmin implements CommandExecutor, TabCompleter {
             } else {
                 list_shop_commands_1 = Arrays.asList("Look at a shop for auto location completion!");
             }
-            List<String> list_shop_commands_2 = Arrays.asList(Arrays.stream(ShopCommandManager.ShopAction.values()).map(Enum::name).toArray(String[]::new));
             List<String> list_shop_commands_3 = Arrays.asList("[option]");
             List<String> list_shop_commands_4 = Arrays.asList("add", "move", "edit", "remove");
             List<String> list_shop_commands_5 = Arrays.asList("[index]");
@@ -259,8 +174,6 @@ public class EcsAdmin implements CommandExecutor, TabCompleter {
                 } else if (args.length > 1 && args[0].equalsIgnoreCase("shop-commands")) {
                     if (args.length == 2) {
                         StringUtil.copyPartialMatches(args[1], list_shop_commands_1, fList);
-                    } else if (args.length == 3) {
-                        StringUtil.copyPartialMatches(args[2], list_shop_commands_2, fList);
                     } else if (args.length == 4) {
                         StringUtil.copyPartialMatches(args[3], list_shop_commands_3, fList);
                     } else if (args.length == 5) {
@@ -291,14 +204,7 @@ public class EcsAdmin implements CommandExecutor, TabCompleter {
 
     private void removeShop(Player player, String[] args, Block target) {
         if (target != null && target.getType() != Material.AIR) {
-            //slimefun check
-            if (EzChestShop.slimefun) {
-                boolean sfresult = BlockStorage.hasBlockInfo(target.getLocation());
-                if (sfresult) {
-                    player.sendMessage(LanguageManager.getInstance().slimeFunBlockNotSupported());
-                    return;
-                }
-            }
+
             BlockState blockState = target.getState(false);
             if (blockState instanceof TileState state) {
                 if (Utils.isApplicableContainer(target)) {
@@ -365,22 +271,6 @@ public class EcsAdmin implements CommandExecutor, TabCompleter {
     private void createShop(Player player, String[] args, Block target) throws IOException {
         if (target != null && target.getType() != Material.AIR) {
             BlockState blockState = target.getState(false);
-            //slimefun check
-            if (EzChestShop.slimefun) {
-                boolean sfresult = BlockStorage.hasBlockInfo(target.getLocation());
-                if (sfresult) {
-                    player.sendMessage(LanguageManager.getInstance().slimeFunBlockNotSupported());
-                    return;
-                }
-            }
-            //slimefun check
-            if (EzChestShop.slimefun) {
-                boolean sfresult = BlockStorage.hasBlockInfo(target.getLocation());
-                if (sfresult) {
-                    player.sendMessage(LanguageManager.getInstance().slimeFunBlockNotSupported());
-                    return;
-                }
-            }
 
             if (EzChestShop.worldguard) {
                 if (!WorldGuardUtils.queryStateFlag(FlagRegistry.CREATE_ADMIN_SHOP, player)) {
@@ -523,13 +413,6 @@ public class EcsAdmin implements CommandExecutor, TabCompleter {
     private BlockState getLookedAtBlockState(Player player, boolean sendErrors, boolean isCreateOrRemove, Block target) {
         if (target != null && target.getType() != Material.AIR) {
             BlockState blockState = target.getState(false);
-            if (EzChestShop.slimefun) {
-                boolean sfresult = BlockStorage.hasBlockInfo(blockState.getBlock().getLocation());
-                if (sfresult) {
-                    player.sendMessage(LanguageManager.getInstance().slimeFunBlockNotSupported());
-                    return null;
-                }
-            }
             if (blockState instanceof TileState) {
                 if (Utils.isApplicableContainer(target)) {
                     if (checkIfLocation(target.getLocation(), player)) {

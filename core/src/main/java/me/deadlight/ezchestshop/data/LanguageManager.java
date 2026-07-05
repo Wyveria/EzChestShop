@@ -15,7 +15,6 @@ import me.deadlight.ezchestshop.Constants;
 import me.deadlight.ezchestshop.EzChestShop;
 import me.deadlight.ezchestshop.data.gui.GuiData;
 import me.deadlight.ezchestshop.utils.Utils;
-import me.deadlight.ezchestshop.utils.objects.CheckProfitEntry;
 import me.deadlight.ezchestshop.utils.objects.ShopSettings;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -907,48 +906,6 @@ public final class LanguageManager {
                 .replace("%cost%", Utils.formatNumber(sellCost, Utils.FormatType.CHAT))
                 .replace("%purchases%", Utils.formatNumber(sellAmount, Utils.FormatType.CHAT))
                 .replace("%total%", Utils.formatNumber(total, Utils.FormatType.CHAT)));
-    }
-
-    public BaseComponent[] checkProfitsDetailpage(Player player, List<CheckProfitEntry> checkProfitEntries, int page, int pages) {
-        ComponentBuilder compb = new ComponentBuilder("");
-        //Header
-        compb.append(MineDown.parse(getList("checkprofits.details-menu.header").stream().map(Utils::colorify).collect(Collectors.joining("\n")))).append("\n");
-        //Content
-        for (int i = 0; i < Config.command_checkprofit_lines_pp; i++) {
-            int index = i + ((page - 1) * Config.command_checkprofit_lines_pp);
-            if (index == checkProfitEntries.size()) break;
-            CheckProfitEntry checkProfitEntry = checkProfitEntries.get(i + ((page - 1) * Config.command_checkprofit_lines_pp));
-            String[] details = getList("checkprofits.details-menu.content").stream().map(Utils::colorify).collect(Collectors.joining("\n")).split("%item%");
-            for (int j = 0; j < details.length; j++) {
-                compb.append(MineDown.parse(details[j].replace("%currency%", Config.currency).replace("%income%", "" + checkProfitEntry.getBuyPrice()).replace("%sales%", "" + checkProfitEntry.getBuyAmount()).replace("%unit_income%", "" + checkProfitEntry.getBuyUnitPrice()).replace("%cost%", "" + checkProfitEntry.getSellPrice()).replace("%purchases%", "" + checkProfitEntry.getSellAmount()).replace("%unit_cost%", "" + checkProfitEntry.getSellUnitPrice())), ComponentBuilder.FormatRetention.NONE);
-                if (details.length - 1 != j) {
-                    compb.append(TextComponent.fromLegacyText(Utils.getFinalItemName(checkProfitEntry.getItem())));
-                    // It hover has proved to break often between Minecraft versions.
-                    // This would be an easy solve using Adventure, but that requires further changes, and is currently out of scope.
-                    //.event(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new BaseComponent[]{new TextComponent(Utils.itemStackToSnbt(checkProfitEntry.getItem()))}));
-                } else {
-                    compb.append("\n");
-                }
-            }
-        }
-        //Footer
-        compb.append(MineDown.parse(getList("checkprofits.details-menu.footer").stream().map(s -> {
-            s = Utils.colorify(s);
-            s = s.replace("%page%", "" + page).replace("%pages%", "" + pages);
-            if (page > 1) {
-                s = s.replace("%button_previous%", "[← ](" + getButtonPrevious() + " run_command=/cp p " + (page - 1) + ")");
-            } else {
-                s = s.replace("%button_previous%", "");
-            }
-            if (page < pages) {
-                s = s.replace("%button_next%", "[ →](" + getButtonNext() + " run_command=/cp p " + (page + 1) + ")");
-            } else {
-                s = s.replace("%button_next%", "");
-            }
-            return s;
-        }).collect(Collectors.joining("\n"))), ComponentBuilder.FormatRetention.NONE);
-
-        return compb.create();
     }
 
     public String getButtonNext() {

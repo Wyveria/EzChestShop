@@ -235,17 +235,6 @@ public class SettingsGUI {
                         lm.hologramMessageButtonLoreMaxReached(player));
                 GuiItem customMessageItem = new GuiItem(customMessageItemStack.getItem(), event -> {
                     event.setCancelled(true);
-                    if (maxMessages - currentMessages > 0 || !value) {
-                        if (event.isRightClick()) {
-                            CustomMessageManageGUI customMessageManageGUI = new CustomMessageManageGUI();
-                            customMessageManageGUI.showGUI(player, containerBlock, isAdmin);
-                        } else {
-                            openCustomMessageEditor(player, containerBlock.getLocation());
-                        }
-                    } else {
-                        CustomMessageManageGUI customMessageManageGUI = new CustomMessageManageGUI();
-                        customMessageManageGUI.showGUI(player, containerBlock, isAdmin);
-                    }
                 });
                 if (Config.settings_hologram_message_enabled) {
                     Utils.addItemIfEnoughSlots(gui, customMessageItemStack.getSlot(), customMessageItem);

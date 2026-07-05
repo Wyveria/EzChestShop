@@ -108,7 +108,6 @@ public final class Config {
     public static ConfigurationSection newShopWebhookTemplate;
 
     public static boolean shopCommandsEnabled;
-    public static ShopCommandManager shopCommandManager;
 
 
     public static void loadConfig() {
@@ -228,7 +227,6 @@ public final class Config {
         }
 
         shopCommandsEnabled = config.getBoolean("shops.commands.enabled");
-        shopCommandManager = new ShopCommandManager();
     }
 
 
